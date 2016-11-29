@@ -20,15 +20,15 @@ from films import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^films$', views.film_list),
-    url(r'^films/(?P<pk>[0-9]+)$', views.film_detail),
-    url(r'^films/(?P<pk>[0-9]+)/theaters$', views.film_theaters_list),
-    url(r'^theaters$', views.theater_list),
-    url(r'^theaters/(?P<pk>[0-9]+)$', views.theater_detail),
-    url(r'^theaters/(?P<pk>[0-9]+)/films$', views.theater_films_list),
-    url(r'^genres$', views.genre_list),
-    url(r'^genres/(?P<pk>[0-9]+)$', views.genre_detail),
-    url(r'^genres/(?P<pk>[0-9]+)/films$', views.genre_films_list),
+    url(r'^films$', views.FilmList.as_view()),
+    url(r'^films/(?P<pk>[0-9]+)$', views.FilmDetail.as_view()),
+    # url(r'^films/(?P<pk>[0-9]+)/theaters$', views.film_theaters_list),
+    url(r'^theaters$', views.TheaterList.as_view()),
+    url(r'^theaters/(?P<pk>[0-9]+)$', views.TheaterDetail.as_view()),
+    # url(r'^theaters/(?P<pk>[0-9]+)/films$', views.theater_films_list),
+    # url(r'^genres$', views.genre_list),
+    # url(r'^genres/(?P<pk>[0-9]+)$', views.genre_detail),
+    # url(r'^genres/(?P<pk>[0-9]+)/films$', views.genre_films_list),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
