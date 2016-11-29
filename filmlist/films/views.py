@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from films.models import Film, Theater, Genre
-from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer
+from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer, FilmWriteSerializer
 
 @api_view(['GET', 'POST'])
 def film_list(request, format=None):
@@ -11,15 +11,15 @@ def film_list(request, format=None):
     """
     if request.method == 'GET':
         films = Film.objects.all()
-        serializer = FilmSerializer(films, many=True)
-        return Response(serializer.data)
+        serializedFilm = FilmSerializer(films, many=True)
+        return Response(serializedFilm.data)
 
     elif request.method == 'POST':
-        serializer = FilmSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializedFilm = FilmWriteSerializer(data=request.data)
+        if serializedFilm.is_valid():
+            serializedFilm.save()
+            return Response(serializedFilm.data, status=status.HTTP_201_CREATED)
+        return Response(serializedFilm.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET', 'POST'])
 def theater_list(request, format=None):
     """
@@ -27,15 +27,15 @@ def theater_list(request, format=None):
     """
     if request.method == 'GET':
         theaters = Theater.objects.all()
-        serializer = TheaterSerializer(theaters, many=True)
-        return Response(serializer.data)
+        serializedtheater = TheaterSerializer(theaters, many=True)
+        return Response(serializedtheater.data)
 
     elif request.method == 'POST':
-        serializer = TheaterSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializedtheater = TheaterSerializer(data=request.data)
+        if serializedtheater.is_valid():
+            serializedtheater.save()
+            return Response(serializedtheater.data, status=status.HTTP_201_CREATED)
+        return Response(serializedtheater.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET', 'POST'])
 def genre_list(request, format=None):
     """
@@ -43,15 +43,15 @@ def genre_list(request, format=None):
     """
     if request.method == 'GET':
         genres = Genre.objects.all()
-        serializer = GenreSerializer(genres, many=True)
-        return Response(serializer.data)
+        serializedgenre = GenreSerializer(genres, many=True)
+        return Response(serializedgenre.data)
 
     elif request.method == 'POST':
-        serializer = GenreSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializedgenre = GenreSerializer(data=request.data)
+        if serializedgenre.is_valid():
+            serializedgenre.save()
+            return Response(serializedgenre.data, status=status.HTTP_201_CREATED)
+        return Response(serializedgenre.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET', 'PATCH'])
 def film_theaters_list(request, pk, format=None):
     """
@@ -92,6 +92,54 @@ def theater_films_list(request, pk, format=None):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+
+
+
+
+@api_view(['GET', 'PATCH'])
+def film_genre_list(request, pk, format=None):
+    """
+    List all snippets for a film's genre.
+    """
+    try:
+        film = Film.objects.get(pk=pk)
+    except Film.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        genre = film.genre
+        serializer = GenreSerializer(genre)
+        return Response(serializer.data)
+    if request.method == 'PATCH':
+        genre_id = int(request.data["genre"])
+        genre = Genre.objects.get(id=genre_id)
+        film.genre = genre
+        serializer = GenreSerializer(genre)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+@api_view(['GET', 'PATCH'])
+def genre_films_list(request, pk, format=None):
+    """
+    List all snippets for films in specific genre.
+    """
+    try:
+        genre = Genre.objects.get(pk=pk)
+    except Genre.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        films = genre.film_set.all()
+        serializer = FilmSerializer(films, many=True)
+        return Response(serializer.data)
+    if request.method == 'PATCH':
+        film_id = int(request.data["film"])
+        film = Film.objects.get(id=film_id)
+        genre.film_set.add(film)
+        serializer = GenreSerializer(genre)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def film_detail(request, pk, format=None):
     """
@@ -103,11 +151,11 @@ def film_detail(request, pk, format=None):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = FilmSerializer(film)
+        serializer = FilmWriteSerializer(film)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = FilmSerializer(film, data=request.data)
+        serializer = FilmWriteSerializer(film, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

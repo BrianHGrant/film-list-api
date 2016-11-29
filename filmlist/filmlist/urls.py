@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^theaters/(?P<pk>[0-9]+)/films$', views.theater_films_list),
     url(r'^genres$', views.genre_list),
     url(r'^genres/(?P<pk>[0-9]+)$', views.genre_detail),
+    url(r'^genres/(?P<pk>[0-9]+)/films$', views.genre_films_list),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
