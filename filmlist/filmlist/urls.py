@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^films$', views.FilmList.as_view()),
     url(r'^films/(?P<pk>[0-9]+)$', views.FilmDetail.as_view()),
-    # url(r'^films/(?P<pk>[0-9]+)/theaters$', views.film_theaters_list),
+    # url(r'^films/(?P<pk>[0-9]+)/theaters$', views.FilmTheaterList.as_view()),
     url(r'^theaters$', views.TheaterList.as_view()),
     url(r'^theaters/(?P<pk>[0-9]+)$', views.TheaterDetail.as_view()),
     # url(r'^theaters/(?P<pk>[0-9]+)/films$', views.theater_films_list),
