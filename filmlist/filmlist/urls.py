@@ -26,8 +26,8 @@ urlpatterns = [
     url(r'^theaters$', views.TheaterList.as_view()),
     url(r'^theaters/(?P<pk>[0-9]+)$', views.TheaterDetail.as_view()),
     # url(r'^theaters/(?P<pk>[0-9]+)/films$', views.theater_films_list),
-    # url(r'^genres$', views.genre_list),
-    # url(r'^genres/(?P<pk>[0-9]+)$', views.genre_detail),
+    url(r'^genres$', views.GenreList.as_view()),
+    url(r'^genres/(?P<pk>[0-9]+)$', views.GenreDetail.as_view()),
     # url(r'^genres/(?P<pk>[0-9]+)/films$', views.genre_films_list),
 ]
 

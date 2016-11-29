@@ -7,13 +7,13 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'film_set')
 
 class FilmSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer()
+    genre = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), allow_null=True)
     class Meta:
         model = Film
         fields = ('id', 'title', 'year_prod', 'genre', 'theaters')
 
 class TheaterSerializer(serializers.ModelSerializer):
-    film_set = FilmSerializer(many=True)
+    film_set = FilmSerializer(many=True, read_only=True)
     class Meta:
         model = Theater
         fields = ('id', 'name', 'city', 'state', 'film_set')

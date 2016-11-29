@@ -1,9 +1,10 @@
-from films.models import Film
-from films.serializers import FilmSerializer, TheaterSerializer
+from films.models import Film, Theater, Genre
+from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
 # from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer, FilmWriteSerializer
 
 class FilmList(APIView):
@@ -60,6 +61,7 @@ class TheaterList(APIView):
         serialized_theaters = TheaterSerializer(theaters, many=True)
         return Response(serialized_theaters.data)
 
+
     def post(self, request, format=None):
         theater = TheaterSerializer(data=request.data)
         if theater.is_valid():
@@ -94,6 +96,45 @@ class TheaterDetail(APIView):
         theater = self.get_object(pk)
         theater.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GenreList(APIView):
+    def get(self, request, format=None):
+        genres = Genre.objects.all()
+        serialized_genres = GenreSerializer(genres, many=True)
+        return Response(serialized_genres.data)
+
+    def post(self, request, format=None):
+        serialized_genre = GenreSerializer(data=request.data)
+        if serialized_genre.is_valid():
+            serialized_genre.save()
+            return Response(serialized_genre.data, status=status.HTTP_201_CREATED)
+        return Response(serialized_genre.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GenreDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Genre.objects.get(pk=pk)
+        except Genre.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        genre = self.get_object(pk)
+        serialized_genre = GenreSerializer(genre)
+        return Response(serialized_genre.data)
+
+    def put(self, request, pk, format=None):
+        genre = self.get_object(pk)
+        serialized_genre = GenreSerializer(genre, data=request.data)
+        if serialized_genre.is_valid():
+            serialized_genre.save()
+            return Response(serialized_genre.data)
+        return Response(serialized_genre.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        genre = self.get_object(pk)
+        genre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 # @api_view(['GET', 'POST'])
