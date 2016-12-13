@@ -1,14 +1,19 @@
 from films.models import Film, Theater, Genre
-from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer, FilmWriteSerializer, GenreWriteSerializer
+from films.serializers import FilmSerializer, TheaterSerializer, GenreSerializer, FilmWriteSerializer, GenreWriteSerializer, UserSerializer
 from django.http import Http404
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.models import User
+from films.permissions import IsOwnerOrReadOnly
+
 
 class FilmList(generics.ListCreateAPIView):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
 
     # def get(self, request, *args, **kwargs):
     #     year_prod = request.GET.get('year_prod', ' ')
@@ -41,13 +46,20 @@ class FilmList(generics.ListCreateAPIView):
         else:
             return Response(FilmSerializer(Film.objects.all(),many=True).data) # if no keys, returns unfiltered list of films
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 class FilmDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
 
 class TheaterList(generics.ListCreateAPIView):
     queryset = Theater.objects.all()
     serializer_class = TheaterSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
 
     def get(self, request, *args, **kwargs):
         k = request.GET.keys()
@@ -64,10 +76,14 @@ class TheaterList(generics.ListCreateAPIView):
 class TheaterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Theater.objects.all()
     serializer_class = TheaterSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
 
 class GenreList(generics.ListCreateAPIView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
 
     def get_serializer_class(self):
         if(self.request.method == 'GET'):
@@ -90,3 +106,17 @@ class GenreList(generics.ListCreateAPIView):
 class GenreDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      IsOwnerOrReadOnly,)
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      permissions.IsAdminUser,)
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                      permissions.IsAdminUser,)
